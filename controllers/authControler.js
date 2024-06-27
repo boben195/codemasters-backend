@@ -54,7 +54,7 @@ const login = async (req, res, next) => {
         }
     const newSession = await Session.create({ uid: user._id });
   
-  const accessToken = jwt.sign(
+  const token = jwt.sign(
     { uid: user._id, sid: newSession._id },
     JWT_SECRET,
     { expiresIn: "22h" }
@@ -68,12 +68,12 @@ const login = async (req, res, next) => {
         
 
     /*Цей код зберігає аксес токен до бази. Коментуйте цю частину якщо не бажаєте зберігати. Зроблено для перевірки */
-        user.token = accessToken;
-        await user.save();
+        // user.token = token;
+        // await user.save();
     /*Цей код зберігає аксес токен до бази. Коментуйте цю частину якщо не бажаєте зберігати. Зроблено для перевірки */
         
 
-       return res.status(200).json({accessToken, refreshToken, sid: newSession._id, email: user.email,})
+       return res.status(200).json({token, refreshToken, sid: newSession._id, email: user.email,})
     }
     catch(error) {
         next(error)
@@ -86,7 +86,7 @@ const logout = async (req, res, next) => {
         await Session.findByIdAndDelete(sid);
 
         /*Цей рядок видаляє токен з бази - закоментуйте його якщо коментувал код в login. Зроблено для перевірки */
-        await User.findByIdAndUpdate(uid, { token: null });
+        // await User.findByIdAndUpdate(uid, { token: null });
         /*Цей рядок видаляє токен з бази - закоментуйте його якщо коментувал код в login. Зроблено для перевірки */
         /*Тут могла бути ваша реклама */
 
@@ -128,7 +128,7 @@ const refreshToken = async (req, res, next) => {
             { expiresIn: "22h" }
         );
 
-        return res.status(200).json({accessToken: newAccessToken, refreshToken: newRefreshToken})
+        return res.status(200).json({token: newAccessToken, refreshToken: newRefreshToken})
     }
     
     catch(error) {
