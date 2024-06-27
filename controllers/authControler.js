@@ -11,7 +11,7 @@ import jwt from "jsonwebtoken";
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
-const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_TOKEN;
+const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET;
 
 const registerUser = async (req, res, next) => {
     try {

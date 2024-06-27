@@ -132,4 +132,4 @@ dist
 .pnp.*
 
 tmp/*
-!tpm/.gitkeep
+!tmp/.gitkeep

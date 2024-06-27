@@ -10,6 +10,6 @@ usersRouter.get("/current", auth, userServices.currentUser);
 
 usersRouter.get("/all", userServices.getAllUsers);
 
-usersRouter.patch("/update", auth, upload.single("avatar"), userServices.updateUser);
+usersRouter.patch("/update", auth, upload.single("avatarURL"), userServices.updateUser);
     
 export default usersRouter;
