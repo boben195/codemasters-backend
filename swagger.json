@@ -104,6 +104,62 @@
         }
       }
     },
+    "/auth/verify/:verificationToken": {
+      "get": {
+        "summary": "Verification email",
+        "tags": [
+          "Auth"
+        ],
+        "parameters": [
+          {
+            "name": "verificationToken",
+            "description": "Email verification token",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Verification successful"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      }
+    },
+    "/auth/verify": {
+      "post": {
+        "summary": "Resend verification email",
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResendEmail"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Verification email sent"
+          },
+          "400": {
+            "description": "Verification has already been passed"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      }
+    },
     "/auth/logout": {
       "post": {
         "summary": "Logout user",
@@ -545,7 +601,7 @@
       "UserLoginResponse": {
         "type": "object",
         "properties": {
-          "token": {
+          "accessToken": {
             "example": "NiIsInR5cCI6IkpfffggghbGciOiJIUzI1..."
           },
           "refreshToken": {
@@ -573,6 +629,18 @@
             }
           }
         }
+      },
+      "ResendEmail": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "alex@example.com",
+            "description": "User email address"
+          }
+        },
+        "required": ["email"]
       },
       "UserCurrentResponse": {
         "type": "object",
@@ -625,8 +693,8 @@
         "properties": {
           "amount": {
             "type": "number",
-            "example": 0.5,
-            "description": "Amount of water"
+            "example": 50,
+            "description": "Amount of water in ml"
           },
           "year": {
             "type": "number",
@@ -636,17 +704,17 @@
           "month": {
             "type": "number",
             "example": 0,
-            "description": "User password"
+            "description": "Month"
           },
           "day": {
             "type": "number",
             "example": 1,
-            "description": "Confirm password"
+            "description": "Day"
           },
           "time": {
             "type": "string",
             "example": "00:16:06",
-            "description": "Confirm password"
+            "description": "Time"
           }
         },
         "required": [

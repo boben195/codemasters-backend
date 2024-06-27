@@ -4,6 +4,7 @@ import waterServices from "../controllers/waterControler.js";
 import waterValidationServices from "../middlewares/waterValidation.js";
 import { auth } from "../middlewares/auth.js";
 
+/* endpoint: /water */
 const waterRouter = express.Router();
 
 waterRouter.post(

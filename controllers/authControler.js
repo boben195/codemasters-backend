@@ -5,6 +5,8 @@ import Session from "../models/session.js";
 import bcrypt from "bcryptjs";
 import cripto from "node:crypto";
 import jwt from "jsonwebtoken";
+import mailer from "../helpers/mailer.js";
+import HttpError from "../helpers/HttpError.js";
 
 
 
@@ -28,8 +30,10 @@ const registerUser = async (req, res, next) => {
 
         const passwordHash = await bcrypt.hash(password, 10)
         const newUser = await User.create({ email, password: passwordHash, verificationToken })
+
+        await mailer.sendVerificationEmail(email, verificationToken);
+
         /*Тут має бути граватар */
-        /*Тут має бути верифікація емейла */
         res.status(201).json({email: newUser.email, message: "New user is born"})
     }
     catch(error) {
@@ -46,12 +50,15 @@ const login = async (req, res, next) => {
     const user = await User.findOne({ email });
 
     if (user === null) {
-            return res.status(401).send({message: "Email or password is wrong"})
+        return res.status(404).send({message: "User not found"})
+    }
+    if (!user.verify) {
+        return res.status(403).send({message: "Email requires confirmation!"})
     }
     const passwordCompare = await bcrypt.compare(password, user.password);
-        if (passwordCompare === false) {
-            return res.status(401).send({message: "Email or password is wrong"})
-        }
+    if (passwordCompare === false) {
+        return res.status(401).send({message: "Email or password is wrong"})
+    }
     const newSession = await Session.create({ uid: user._id });
   
   const accessToken = jwt.sign(
@@ -65,15 +72,16 @@ const login = async (req, res, next) => {
       JWT_REFRESH_SECRET,
     { expiresIn: "22h" }
         );
-        
 
-    /*Цей код зберігає аксес токен до бази. Коментуйте цю частину якщо не бажаєте зберігати. Зроблено для перевірки */
-        user.token = accessToken;
-        await user.save();
-    /*Цей код зберігає аксес токен до бази. Коментуйте цю частину якщо не бажаєте зберігати. Зроблено для перевірки */
-        
-
-       return res.status(200).json({accessToken, refreshToken, sid: newSession._id, email: user.email,})
+       return res.status(200).json({
+           accessToken,
+           refreshToken,
+           user: {
+               name: user.name,
+               email: user.email,
+               avatarURL: user.avatarURL
+           }
+       });
     }
     catch(error) {
         next(error)
@@ -82,14 +90,8 @@ const login = async (req, res, next) => {
 
 const logout = async (req, res, next) => {
     try {
-        const { uid, sid } = req.user
+        const { sid } = req.user
         await Session.findByIdAndDelete(sid);
-
-        /*Цей рядок видаляє токен з бази - закоментуйте його якщо коментувал код в login. Зроблено для перевірки */
-        await User.findByIdAndUpdate(uid, { token: null });
-        /*Цей рядок видаляє токен з бази - закоментуйте його якщо коментувал код в login. Зроблено для перевірки */
-        /*Тут могла бути ваша реклама */
-
         res.status(204).json({ message: "Successfully logged out" });
     }
     catch(error) {
@@ -137,8 +139,40 @@ const refreshToken = async (req, res, next) => {
 }
 
 
+const verificationEmail = async (req, res, next) => {
+    try {
+        const {verificationToken} = req.params;
+        const user = await User.findOne({verificationToken});
+        if (!user) throw HttpError(404, "User not found");
+
+        const verifiedUser = await User.findByIdAndUpdate(user._id, {verify: true, verificationToken: null}, {new: true});
+        if (verifiedUser) {
+            res.status(200).json({
+                message: "Verification successful"
+            });
+        }
+    } catch (e) {
+        next(e);
+    }
+};
+
+const resendVerificationEmail = async (req, res, next) => {
+    try {
+        const {email} = req.body;
+        const user = await User.findOne({email});
+
+        if (!user) throw HttpError(404, "User not found");
+        if (user.verify) throw HttpError(400, "Verification has already been passed");
+
+        await mailer.sendVerificationEmail(user.email, user.verificationToken);
+        res.status(200).json({
+            message: "Verification email sent"
+        });
+    } catch (e) {
+        next(e)
+    }
+};
 
 
-
-const userServices = { registerUser, login, logout, refreshToken };
+const userServices = { registerUser, login, logout, refreshToken, verificationEmail, resendVerificationEmail };
 export default userServices;

@@ -4,7 +4,6 @@ const contactSchema = new mongoose.Schema(
     {
         name: {
             type: String,
-            
         },
         password: {
             type: String,
@@ -27,10 +26,6 @@ const contactSchema = new mongoose.Schema(
         },
         dailyWaterRate: {
             type: Number,
-        },
-        token: {
-            type: String,
-            default: null,
         },
         avatarURL: String,
         verify: {

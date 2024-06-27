@@ -2,17 +2,21 @@ import express from "express";
 
 import validateBody from "../helpers/validateBody.js";
 import authServices from "../controllers/authControler.js";
-import { registerSchema, loginSchema } from "../schemas/userSchema.js";
+import {registerSchema, loginSchema, verifyEmailSchema} from "../schemas/userSchema.js";
 import {auth} from "../middlewares/auth.js"
 
-const usersRouter = express.Router();
+/* endpoint: /auth */
+const authRouter = express.Router();
 
-usersRouter.post("/register", validateBody(registerSchema), authServices.registerUser);
+authRouter.post("/register", validateBody(registerSchema), authServices.registerUser);
 
-usersRouter.post("/login", validateBody(loginSchema), authServices.login);
+authRouter.post("/login", validateBody(loginSchema), authServices.login);
 
-usersRouter.post("/logout", auth, authServices.logout);
+authRouter.post("/logout", auth, authServices.logout);
 
-usersRouter.post("/refresh", auth, authServices.refreshToken);
+authRouter.post("/refresh", auth, authServices.refreshToken);
 
-export default usersRouter;
+authRouter.get('/verify/:verificationToken', authServices.verificationEmail);
+authRouter.post('/verify', validateBody(verifyEmailSchema), authServices.resendVerificationEmail);
+
+export default authRouter;
