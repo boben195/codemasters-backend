@@ -663,6 +663,11 @@
             "type": "number",
             "example": 50,
             "description": "Amount of water in ml"
+          },
+          "time": {
+            "type": "string",
+            "example": "00:16",
+            "description": "Time"
           }
         },
         "required": [

@@ -26,6 +26,16 @@ const editWaterSchema = Joi.object({
     "any.required": '"userId" is required',
   }),
   amount: Joi.number().min(50).max(12000).required(),
+  time: Joi.string()
+      .pattern(
+          /^([01]\d|2[0-3]):([0-5]\d)$/,
+          "HH:MM format - example '00:16'"
+      )
+      .required()
+      .messages({
+        "string.pattern.base":
+            "Time must be in the format HH:MM - example '00:16'",
+      }),
 });
 
 const deleteWaterSchema = Joi.object({
