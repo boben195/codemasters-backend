@@ -5,14 +5,18 @@ import authServices from "../controllers/authControler.js";
 import { registerSchema, loginSchema } from "../schemas/userSchema.js";
 import {auth} from "../middlewares/auth.js"
 
-const usersRouter = express.Router();
+const authRouter = express.Router();
 
-usersRouter.post("/register", validateBody(registerSchema), authServices.registerUser);
+authRouter.post("/register", validateBody(registerSchema), authServices.registerUser);
 
-usersRouter.post("/login", validateBody(loginSchema), authServices.login);
+authRouter.post("/login", validateBody(loginSchema), authServices.login);
 
-usersRouter.post("/logout", auth, authServices.logout);
+authRouter.post("/logout", auth, authServices.logout);
 
-usersRouter.post("/refresh", auth, authServices.refreshToken);
+authRouter.post("/refresh", auth, authServices.refreshToken);
 
-export default usersRouter;
+// authRouter.get("/google", authServices.googleAuth);
+
+// authRouter.get("/google-redirect", authServices.googleRedirect);
+
+export default authRouter;

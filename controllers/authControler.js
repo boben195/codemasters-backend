@@ -5,6 +5,8 @@ import Session from "../models/session.js";
 import bcrypt from "bcryptjs";
 import cripto from "node:crypto";
 import jwt from "jsonwebtoken";
+import queryString from 'query-string';
+import axios from "axios";
 
 
 
@@ -67,10 +69,7 @@ const login = async (req, res, next) => {
         );
         
 
-    /*Цей код зберігає аксес токен до бази. Коментуйте цю частину якщо не бажаєте зберігати. Зроблено для перевірки */
-        // user.token = token;
-        // await user.save();
-    /*Цей код зберігає аксес токен до бази. Коментуйте цю частину якщо не бажаєте зберігати. Зроблено для перевірки */
+   
         
 
        return res.status(200).json({token, refreshToken, sid: newSession._id, email: user.email,})
@@ -85,10 +84,7 @@ const logout = async (req, res, next) => {
         const { uid, sid } = req.user
         await Session.findByIdAndDelete(sid);
 
-        /*Цей рядок видаляє токен з бази - закоментуйте його якщо коментувал код в login. Зроблено для перевірки */
-        // await User.findByIdAndUpdate(uid, { token: null });
-        /*Цей рядок видаляє токен з бази - закоментуйте його якщо коментувал код в login. Зроблено для перевірки */
-        /*Тут могла бути ваша реклама */
+       
 
         res.status(204).json({ message: "Successfully logged out" });
     }
@@ -135,6 +131,72 @@ const refreshToken = async (req, res, next) => {
         next(error)
     }
 }
+
+
+// const googleAuth = async (req, res, next) => {
+//     const stingifiedParams = queryString.stringify({
+//         client_id: process.env.GOOGLE_CLIENT_ID,
+//         redirect_uri: `${process.env.BASE_URL}/auth/google-redirect`,
+//         scope: [
+//               "https://www.googleapis.com/auth/userinfo.email",
+//               "https://www.googleapis.com/auth/userinfo.profile",
+//                   ].join(" "),
+//         response_type: "code",
+//         access_type: "offline",
+//         prompt: "consent",
+//     });
+//    return res.redirect(
+//     `https://accounts.google.com/o/oauth2/v2/auth?${stingifiedParams}`
+//     )
+// }
+
+// const googleRedirect = async (req, res, next) => {
+//     const fullUrl = `${req.protocol}://${req.get("host")}${req.originalUrl}`;
+//     const urlObj = new URL(fullUrl);
+//     const urlParams = queryString.parse(urlObj.search);
+//     const code = urlParams.code;
+//     const tokenData = await axios({
+//     url: `https://oauth2.googleapis.com/token`,
+//     method: "post",
+//     data: {
+//       client_id: process.env.GOOGLE_CLIENT_ID,
+//       client_secret: process.env.GOOGLE_CLIENT_SECRET,
+//       redirect_uri: `${process.env.BASE_URL}/auth/google-redirect`,
+//       grant_type: "authorization_code",
+//       code,
+//          },
+//      });
+//     const userData = await axios({
+//       url: "https://www.googleapis.com/oauth2/v2/userinfo",
+//       method: "get",
+//       headers: {
+//          Authorization: `Bearer ${tokenData.data.access_token}`,
+//         },
+//      });
+//      let existingParent = await UserModel.findOne({ email: userData.data.email });
+//         if (!existingParent || !existingParent.originUrl) {
+//             return res.status(403).send({
+//               message:
+//                   "You should register from front-end first.",
+//               });
+//       }
+//     const newSession = await Session.create({ uid: existingParent._id });
+  
+//   const token = jwt.sign(
+//     { uid: existingParent._id, sid: newSession._id },
+//     JWT_SECRET,
+//     { expiresIn: "22h" }
+//   );
+  
+//   const refreshToken = jwt.sign(
+//     { uid: existingParent._id, sid: newSession._id },
+//       JWT_REFRESH_SECRET,
+//     { expiresIn: "22h" }
+//     );
+//     return res.redirect(
+//     `${existingParent.originUrl}?accessToken=${token}&refreshToken=${refreshToken}&sid=${newSession._id}`
+//   );
+// }
 
 
 
