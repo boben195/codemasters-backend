@@ -19,7 +19,7 @@ export const auth = async (req, res, next) => {
     const { uid, sid } = jwt.verify(token, JWT_SECRET);
     const user = await User.findById(uid);
 
-    if (!user || !user.token || user.token !== token) {
+    if (!user) {
       return res.status(401).send({ message: "Not authorized" });
     }
 

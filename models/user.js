@@ -28,10 +28,7 @@ const contactSchema = new mongoose.Schema(
         dailyWaterRate: {
             type: Number,
         },
-        token: {
-            type: String,
-            default: null,
-        },
+        
         avatarURL: String,
         verify: {
             type: Boolean,
