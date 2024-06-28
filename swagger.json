@@ -601,7 +601,7 @@
       "UserLoginResponse": {
         "type": "object",
         "properties": {
-          "accessToken": {
+          "token": {
             "example": "NiIsInR5cCI6IkpfffggghbGciOiJIUzI1..."
           },
           "refreshToken": {
@@ -703,7 +703,7 @@
           },
           "month": {
             "type": "number",
-            "example": 0,
+            "example": 1,
             "description": "Month"
           },
           "day": {
@@ -713,7 +713,7 @@
           },
           "time": {
             "type": "string",
-            "example": "00:16:06",
+            "example": "00:16",
             "description": "Time"
           }
         },
@@ -729,8 +729,13 @@
         "properties": {
           "amount": {
             "type": "number",
-            "example": 0.5,
-            "description": "Amount of water"
+            "example": 50,
+            "description": "Amount of water in ml"
+          },
+          "time": {
+            "type": "string",
+            "example": "00:16",
+            "description": "Time"
           }
         },
         "required": [
@@ -762,7 +767,7 @@
               },
               "amount": {
                 "type": "number",
-                "example": 0.5
+                "example": 50
               },
               "year": {
                 "type": "number",
@@ -778,7 +783,7 @@
               },
               "time": {
                 "type": "string",
-                "example": "00:16:06"
+                "example": "00:16"
               },
               "_id": {
                 "type": "string",
@@ -802,7 +807,7 @@
                 },
                 "amount": {
                   "type": "number",
-                  "example": 0.5
+                  "example": 50
                 },
                 "year": {
                   "type": "number",
@@ -818,7 +823,7 @@
                 },
                 "time": {
                   "type": "string",
-                  "example": "00:16:06"
+                  "example": "00:16"
                 },
                 "_id": {
                   "type": "string",
@@ -847,7 +852,7 @@
                 },
                 "amount": {
                   "type": "number",
-                  "example": 0.5
+                  "example": 50
                 },
                 "year": {
                   "type": "number",
@@ -863,7 +868,7 @@
                 },
                 "time": {
                   "type": "string",
-                  "example": "00:16:06"
+                  "example": "00:16"
                 },
                 "_id": {
                   "type": "string",

@@ -7,6 +7,8 @@ import cripto from "node:crypto";
 import jwt from "jsonwebtoken";
 import mailer from "../helpers/mailer.js";
 import HttpError from "../helpers/HttpError.js";
+import queryString from 'query-string';
+import axios from "axios";
 
 
 
@@ -61,7 +63,7 @@ const login = async (req, res, next) => {
     }
     const newSession = await Session.create({ uid: user._id });
   
-  const accessToken = jwt.sign(
+  const token = jwt.sign(
     { uid: user._id, sid: newSession._id },
     JWT_SECRET,
     { expiresIn: "22h" }
@@ -130,7 +132,7 @@ const refreshToken = async (req, res, next) => {
             { expiresIn: "22h" }
         );
 
-        return res.status(200).json({accessToken: newAccessToken, refreshToken: newRefreshToken})
+        return res.status(200).json({token: newAccessToken, refreshToken: newRefreshToken})
     }
     
     catch(error) {

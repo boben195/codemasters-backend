@@ -15,8 +15,12 @@ authRouter.post("/login", validateBody(loginSchema), authServices.login);
 authRouter.post("/logout", auth, authServices.logout);
 
 authRouter.post("/refresh", auth, authServices.refreshToken);
+authRouter.get("/google", authServices.googleAuth);
+authRouter.get("/google-redirect", authServices.googleRedirect);
 
 authRouter.get('/verify/:verificationToken', authServices.verificationEmail);
 authRouter.post('/verify', validateBody(verifyEmailSchema), authServices.resendVerificationEmail);
+
+export default authRouter;
 
 export default authRouter;
