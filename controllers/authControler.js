@@ -33,7 +33,8 @@ const registerUser = async (req, res, next) => {
         const passwordHash = await bcrypt.hash(password, 10)
         const newUser = await User.create({ email, password: passwordHash, verificationToken })
 
-        await mailer.sendVerificationEmail(email, verificationToken);
+        // Uncomment if verify email feature used
+        // await mailer.sendVerificationEmail(email, verificationToken);
 
         /*Тут має бути граватар */
         res.status(201).json({email: newUser.email, message: "New user is born"})
@@ -54,9 +55,10 @@ const login = async (req, res, next) => {
     if (user === null) {
         return res.status(404).send({message: "User not found"})
     }
-    if (!user.verify) {
-        return res.status(403).send({message: "Email requires confirmation!"})
-    }
+    // Uncomment if verify email feature used
+    // if (!user.verify) {
+    //     return res.status(403).send({message: "Email requires confirmation!"})
+    // }
     const passwordCompare = await bcrypt.compare(password, user.password);
     if (passwordCompare === false) {
         return res.status(401).send({message: "Email or password is wrong"})
@@ -76,7 +78,7 @@ const login = async (req, res, next) => {
         );
 
        return res.status(200).json({
-           accessToken,
+           token,
            refreshToken,
            user: {
                name: user.name,
@@ -175,6 +177,73 @@ const resendVerificationEmail = async (req, res, next) => {
     }
 };
 
+// !!!  Богдан, BASE_URL, которую ты юзаешь далее нет в енв файле.
+// Может уточнить что за урл, например:  APP_BASE_URL?
+
+// const googleAuth = async (req, res, next) => {
+//     const stingifiedParams = queryString.stringify({
+//         client_id: process.env.GOOGLE_CLIENT_ID,
+//         redirect_uri: `${process.env.BASE_URL}/auth/google-redirect`,
+//         scope: [
+//               "https://www.googleapis.com/auth/userinfo.email",
+//               "https://www.googleapis.com/auth/userinfo.profile",
+//                   ].join(" "),
+//         response_type: "code",
+//         access_type: "offline",
+//         prompt: "consent",
+//     });
+//    return res.redirect(
+//     `https://accounts.google.com/o/oauth2/v2/auth?${stingifiedParams}`
+//     )
+// }
+//
+// const googleRedirect = async (req, res, next) => {
+//     const fullUrl = `${req.protocol}://${req.get("host")}${req.originalUrl}`;
+//     const urlObj = new URL(fullUrl);
+//     const urlParams = queryString.parse(urlObj.search);
+//     const code = urlParams.code;
+//     const tokenData = await axios({
+//     url: `https://oauth2.googleapis.com/token`,
+//     method: "post",
+//     data: {
+//       client_id: process.env.GOOGLE_CLIENT_ID,
+//       client_secret: process.env.GOOGLE_CLIENT_SECRET,
+//       redirect_uri: `${process.env.BASE_URL}/auth/google-redirect`,
+//       grant_type: "authorization_code",
+//       code,
+//          },
+//      });
+//     const userData = await axios({
+//       url: "https://www.googleapis.com/oauth2/v2/userinfo",
+//       method: "get",
+//       headers: {
+//          Authorization: `Bearer ${tokenData.data.access_token}`,
+//         },
+//      });
+//      let existingParent = await UserModel.findOne({ email: userData.data.email });
+//         if (!existingParent || !existingParent.originUrl) {
+//             return res.status(403).send({
+//               message:
+//                   "You should register from front-end first.",
+//               });
+//       }
+//     const newSession = await Session.create({ uid: existingParent._id });
+//
+//   const token = jwt.sign(
+//     { uid: existingParent._id, sid: newSession._id },
+//     JWT_SECRET,
+//     { expiresIn: "22h" }
+//   );
+//
+//   const refreshToken = jwt.sign(
+//     { uid: existingParent._id, sid: newSession._id },
+//       JWT_REFRESH_SECRET,
+//     { expiresIn: "22h" }
+//     );
+//     return res.redirect(
+//     `${existingParent.originUrl}?accessToken=${token}&refreshToken=${refreshToken}&sid=${newSession._id}`
+//   );
+// }
 
 const userServices = { registerUser, login, logout, refreshToken, verificationEmail, resendVerificationEmail };
 export default userServices;
