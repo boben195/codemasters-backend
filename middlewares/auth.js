@@ -25,7 +25,7 @@ export const auth = async (req, res, next) => {
       return res.status(401).send({ message: "Not authorized" });
     }
 
-    req.user = { uid: user._id, sid, ...user.toObject() };
+    req.user = { uid: user._id, ...user.toObject() };
     next();
   } catch (error) {
     console.error("Error verifying token:", error);

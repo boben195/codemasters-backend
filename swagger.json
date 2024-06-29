@@ -227,7 +227,7 @@
           "content": {
             "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/UserCurrentResponse"
+                "$ref": "#/components/schemas/UserUpdateRequest"
               }
             }
           }
@@ -565,13 +565,33 @@
           "user": {
             "type": "object",
             "properties": {
+              "name": {
+                "type": "string",
+                "example": "User"
+              },
               "email": {
                 "type": "string",
                 "example": "alex@example.com"
               },
-              "message": {
+              "gender": {
                 "type": "string",
-                "example": ""
+                "example": "male"
+              },
+              "weight": {
+                "type": "number",
+                "example": "0"
+              },
+              "activeTimeSport": {
+                "type": "number",
+                "example": "0"
+              },
+              "dailyWaterRate": {
+                "type": "number",
+                "example": "0"
+              },
+              "avatarURL": {
+                "type": "string",
+                "example": "//www.gravatar.com/avatar/000000000000000000"
               }
             }
           }
@@ -601,7 +621,7 @@
       "UserLoginResponse": {
         "type": "object",
         "properties": {
-          "token": {
+          "accessToken": {
             "example": "NiIsInR5cCI6IkpfffggghbGciOiJIUzI1..."
           },
           "refreshToken": {
@@ -610,10 +630,6 @@
           "user": {
             "type": "object",
             "properties": {
-              "id": {
-                "type": "string",
-                "example": "00226b9a73c29e33133f0200"
-              },
               "name": {
                 "type": "string",
                 "example": "Alex"
@@ -622,9 +638,25 @@
                 "type": "string",
                 "example": "alex@example.com"
               },
+              "gender": {
+                "type": "string",
+                "example": "male"
+              },
+              "weight": {
+                "type": "number",
+                "example": "75.5"
+              },
+              "activeTimeSport": {
+                "type": "number",
+                "example": "60"
+              },
+              "dailyWaterRate": {
+                "type": "number",
+                "example": "2.5"
+              },
               "avatarURL": {
                 "type": "string",
-                "example": "//www.gravatar.com/avatar/0000000000000"
+                "example": "//www.gravatar.com/avatar/000000000000000000"
               }
             }
           }
@@ -640,9 +672,11 @@
             "description": "User email address"
           }
         },
-        "required": ["email"]
+        "required": [
+          "email"
+        ]
       },
-      "UserCurrentResponse": {
+      "UserUpdateRequest": {
         "type": "object",
         "properties": {
           "email": {
@@ -661,7 +695,7 @@
             "enum": [
               "male",
               "female",
-              "other"
+              ""
             ],
             "example": "male"
           },
@@ -685,6 +719,57 @@
             "format": "binary",
             "description": "Avatar image",
             "example": "//www.gravatar.com/avatar/000000000000000000"
+          }
+        }
+      },
+      "UserCurrentResponse": {
+        "type": "object",
+        "properties": {
+          "user": {
+            "type": "object",
+            "properties": {
+              "email": {
+                "type": "string",
+                "description": "User email",
+                "example": "alex@example.com"
+              },
+              "name": {
+                "type": "string",
+                "description": "User name",
+                "example": "Alex"
+              },
+              "gender": {
+                "type": "string",
+                "description": "Gender",
+                "enum": [
+                  "male",
+                  "female",
+                  "other"
+                ],
+                "example": "male"
+              },
+              "weight": {
+                "type": "number",
+                "description": "Weight",
+                "example": 75.5
+              },
+              "activeTimeSport": {
+                "type": "number",
+                "description": "Activity time in minutes",
+                "example": 60
+              },
+              "dailyWaterRate": {
+                "type": "number",
+                "description": "Daily water limit",
+                "example": 2.5
+              },
+              "avatarURL": {
+                "type": "string",
+                "format": "binary",
+                "description": "Avatar image",
+                "example": "//www.gravatar.com/avatar/000000000000000000"
+              }
+            }
           }
         }
       },

@@ -37,7 +37,17 @@ const registerUser = async (req, res, next) => {
         // await mailer.sendVerificationEmail(email, verificationToken);
 
         /*Тут має бути граватар */
-        res.status(201).json({email: newUser.email, message: "New user is born"})
+
+        res.status(201).json({user: {
+                "name": newUser.name,
+                "email": newUser.email,
+                "gender": newUser.gender,
+                "weight": newUser.weight,
+                "activeTimeSport": newUser.activeTimeSport,
+                "dailyWaterRate": newUser.dailyWaterRate,
+                "avatarURL": newUser.avatarURL,
+            }
+        })
     }
     catch(error) {
         next(error)
@@ -65,7 +75,7 @@ const login = async (req, res, next) => {
     }
     const newSession = await Session.create({ uid: user._id });
   
-  const token = jwt.sign(
+  const accessToken = jwt.sign(
     { uid: user._id, sid: newSession._id },
     JWT_SECRET,
     { expiresIn: "22h" }
@@ -78,13 +88,17 @@ const login = async (req, res, next) => {
         );
 
        return res.status(200).json({
-           token,
+           accessToken,
            refreshToken,
            user: {
-               name: user.name,
-               email: user.email,
-               avatarURL: user.avatarURL
-           }
+                   "name": user.name,
+                   "email": user.email,
+                   "gender": user.gender,
+                   "weight": user.weight,
+                   "activeTimeSport": user.activeTimeSport,
+                   "dailyWaterRate": user.dailyWaterRate,
+                   "avatarURL": user.avatarURL,
+               }
        });
     }
     catch(error) {
@@ -104,6 +118,7 @@ const logout = async (req, res, next) => {
 
 }
 
+// это ты перенесешь в слой для рефреша, я так понял.
 const refreshToken = async (req, res, next) => {
     const { refreshToken } = req.body;
 
