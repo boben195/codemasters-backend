@@ -7,6 +7,7 @@ import cripto from "node:crypto";
 import jwt from "jsonwebtoken";
 import mailer from "../helpers/mailer.js";
 import HttpError from "../helpers/HttpError.js";
+import gravatar from "gravatar";
 import queryString from 'query-string';
 import axios from "axios";
 
@@ -31,13 +32,12 @@ const registerUser = async (req, res, next) => {
         const verificationToken = cripto.randomUUID();
 
         const passwordHash = await bcrypt.hash(password, 10)
-        const newUser = await User.create({ email, password: passwordHash, verificationToken })
+        const avatarURL = gravatar.url(email);
+        const newUser = await User.create({ email, password: passwordHash, verificationToken, avatarURL })
 
         // Uncomment if verify email feature used
         // await mailer.sendVerificationEmail(email, verificationToken);
-
-        /*Тут має бути граватар */
-
+       
         res.status(201).json({user: {
                 "name": newUser.name,
                 "email": newUser.email,
@@ -109,8 +109,10 @@ const login = async (req, res, next) => {
 const logout = async (req, res, next) => {
     try {
         const { sid } = req.user
+        
+        
         await Session.findByIdAndDelete(sid);
-        res.status(204).json({ message: "Successfully logged out" });
+        res.status(200).json({ message: "Successfully logged out" });
     }
     catch(error) {
         next(error)
@@ -119,6 +121,7 @@ const logout = async (req, res, next) => {
 }
 
 // это ты перенесешь в слой для рефреша, я так понял.
+// Неа це має бути тут
 const refreshToken = async (req, res, next) => {
     const { refreshToken } = req.body;
 
@@ -127,29 +130,33 @@ const refreshToken = async (req, res, next) => {
     }
 
     try {
-        if(!Session) {
+        const { uid, sid } = jwt.verify(refreshToken, JWT_REFRESH_SECRET);
+        const session = await Session.findById(sid);
+        if(!session) {
             return res.status(401).send({message: "Invalid refresh token"})
         }
 
 
-        const user = await User.findById(decoded.uid);
+        const user = await User.findById(uid);
         if (!user) {
             return res.status(401).send({ message: "User not found" });
         }
 
+        const newSession = await Session.create({ uid: user._id });
+
         const newAccessToken = jwt.sign(
-            { uid: user._id, sid: session._id },
+            { uid: user._id, sid: newSession._id },
             JWT_SECRET,
             { expiresIn: "22h" }
         );
 
         const newRefreshToken = jwt.sign(
-            { uid: user._id, sid: session._id },
+            { uid: user._id, sid: newSession._id },
             JWT_REFRESH_SECRET,
             { expiresIn: "22h" }
         );
 
-        return res.status(200).json({token: newAccessToken, refreshToken: newRefreshToken})
+        return res.status(200).json({accessToken: newAccessToken, refreshToken: newRefreshToken})
     }
     
     catch(error) {

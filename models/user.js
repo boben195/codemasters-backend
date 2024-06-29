@@ -30,7 +30,7 @@ const contactSchema = new mongoose.Schema(
         },
         dailyWaterRate: {
             type: Number,
-            default: "0",
+            default: "1.5",
         },
         avatarURL: {
             type: String,
