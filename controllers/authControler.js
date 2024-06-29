@@ -68,10 +68,7 @@ const login = async (req, res, next) => {
     { expiresIn: "22h" }
         );
         
-
-   
-        
-
+         
        return res.status(200).json({token, refreshToken, sid: newSession._id, email: user.email,})
     }
     catch(error) {
@@ -82,11 +79,13 @@ const login = async (req, res, next) => {
 const logout = async (req, res, next) => {
     try {
         const { uid, sid } = req.user
+        const session = await Session.findById(sid);
+        if (!session) {
+            return res.status(401).json({ message: "Session already invalidated" });
+        }
+
         await Session.findByIdAndDelete(sid);
-
-       
-
-        res.status(204).json({ message: "Successfully logged out" });
+        res.status(200).json({ message: "Successfully logged out" });
     }
     catch(error) {
         next(error)

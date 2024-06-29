@@ -1,5 +1,6 @@
 import User from "../models/user.js";
 import jwt from "jsonwebtoken";
+import Session from "../models/session.js";
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -21,6 +22,10 @@ export const auth = async (req, res, next) => {
 
     if (!user) {
       return res.status(401).send({ message: "Not authorized" });
+    }
+    const session = await Session.findById(sid);
+    if (!session) {
+      return res.status(401).send({ message: "Session invalid or expired" });
     }
 
     req.user = { uid: user._id, sid, ...user.toObject() };
