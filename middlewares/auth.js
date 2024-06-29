@@ -18,17 +18,15 @@ export const auth = async (req, res, next) => {
 
   try {
     const { uid, sid } = jwt.verify(token, JWT_SECRET);
-    const user = await User.findById(uid);
 
-    if (!user) {
+    const session = await Session.findById(sid);
+    const user = await User.findById(uid);
+    if (!session || !user) {
       return res.status(401).send({ message: "Not authorized" });
     }
-    const session = await Session.findById(sid);
-    if (!session) {
-      return res.status(401).send({ message: "Session invalid or expired" });
-    }
+    
 
-    req.user = { uid: user._id, sid, ...user.toObject() };
+    req.user = { uid: user._id, ...user.toObject() };
     next();
   } catch (error) {
     console.error("Error verifying token:", error);

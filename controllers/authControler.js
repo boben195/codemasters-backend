@@ -5,6 +5,8 @@ import Session from "../models/session.js";
 import bcrypt from "bcryptjs";
 import cripto from "node:crypto";
 import jwt from "jsonwebtoken";
+import mailer from "../helpers/mailer.js";
+import HttpError from "../helpers/HttpError.js";
 import queryString from 'query-string';
 import axios from "axios";
 
@@ -30,9 +32,22 @@ const registerUser = async (req, res, next) => {
 
         const passwordHash = await bcrypt.hash(password, 10)
         const newUser = await User.create({ email, password: passwordHash, verificationToken })
+
+        // Uncomment if verify email feature used
+        // await mailer.sendVerificationEmail(email, verificationToken);
+
         /*Тут має бути граватар */
-        /*Тут має бути верифікація емейла */
-        res.status(201).json({email: newUser.email, message: "New user is born"})
+
+        res.status(201).json({user: {
+                "name": newUser.name,
+                "email": newUser.email,
+                "gender": newUser.gender,
+                "weight": newUser.weight,
+                "activeTimeSport": newUser.activeTimeSport,
+                "dailyWaterRate": newUser.dailyWaterRate,
+                "avatarURL": newUser.avatarURL,
+            }
+        })
     }
     catch(error) {
         next(error)
@@ -48,15 +63,19 @@ const login = async (req, res, next) => {
     const user = await User.findOne({ email });
 
     if (user === null) {
-            return res.status(401).send({message: "Email or password is wrong"})
+        return res.status(404).send({message: "User not found"})
     }
+    // Uncomment if verify email feature used
+    // if (!user.verify) {
+    //     return res.status(403).send({message: "Email requires confirmation!"})
+    // }
     const passwordCompare = await bcrypt.compare(password, user.password);
-        if (passwordCompare === false) {
-            return res.status(401).send({message: "Email or password is wrong"})
-        }
+    if (passwordCompare === false) {
+        return res.status(401).send({message: "Email or password is wrong"})
+    }
     const newSession = await Session.create({ uid: user._id });
   
-  const token = jwt.sign(
+  const accessToken = jwt.sign(
     { uid: user._id, sid: newSession._id },
     JWT_SECRET,
     { expiresIn: "22h" }
@@ -67,9 +86,20 @@ const login = async (req, res, next) => {
       JWT_REFRESH_SECRET,
     { expiresIn: "22h" }
         );
-        
-         
-       return res.status(200).json({token, refreshToken, sid: newSession._id, email: user.email,})
+
+       return res.status(200).json({
+           accessToken,
+           refreshToken,
+           user: {
+                   "name": user.name,
+                   "email": user.email,
+                   "gender": user.gender,
+                   "weight": user.weight,
+                   "activeTimeSport": user.activeTimeSport,
+                   "dailyWaterRate": user.dailyWaterRate,
+                   "avatarURL": user.avatarURL,
+               }
+       });
     }
     catch(error) {
         next(error)
@@ -78,14 +108,9 @@ const login = async (req, res, next) => {
 
 const logout = async (req, res, next) => {
     try {
-        const { uid, sid } = req.user
-        const session = await Session.findById(sid);
-        if (!session) {
-            return res.status(401).json({ message: "Session already invalidated" });
-        }
-
+        const { sid } = req.user
         await Session.findByIdAndDelete(sid);
-        res.status(200).json({ message: "Successfully logged out" });
+        res.status(204).json({ message: "Successfully logged out" });
     }
     catch(error) {
         next(error)
@@ -93,6 +118,7 @@ const logout = async (req, res, next) => {
 
 }
 
+// это ты перенесешь в слой для рефреша, я так понял.
 const refreshToken = async (req, res, next) => {
     const { refreshToken } = req.body;
 
@@ -132,6 +158,43 @@ const refreshToken = async (req, res, next) => {
 }
 
 
+const verificationEmail = async (req, res, next) => {
+    try {
+        const {verificationToken} = req.params;
+        const user = await User.findOne({verificationToken});
+        if (!user) throw HttpError(404, "User not found");
+
+        const verifiedUser = await User.findByIdAndUpdate(user._id, {verify: true, verificationToken: null}, {new: true});
+        if (verifiedUser) {
+            res.status(200).json({
+                message: "Verification successful"
+            });
+        }
+    } catch (e) {
+        next(e);
+    }
+};
+
+const resendVerificationEmail = async (req, res, next) => {
+    try {
+        const {email} = req.body;
+        const user = await User.findOne({email});
+
+        if (!user) throw HttpError(404, "User not found");
+        if (user.verify) throw HttpError(400, "Verification has already been passed");
+
+        await mailer.sendVerificationEmail(user.email, user.verificationToken);
+        res.status(200).json({
+            message: "Verification email sent"
+        });
+    } catch (e) {
+        next(e)
+    }
+};
+
+// !!!  Богдан, BASE_URL, которую ты юзаешь далее нет в енв файле.
+// Может уточнить что за урл, например:  APP_BASE_URL?
+
 // const googleAuth = async (req, res, next) => {
 //     const stingifiedParams = queryString.stringify({
 //         client_id: process.env.GOOGLE_CLIENT_ID,
@@ -148,7 +211,7 @@ const refreshToken = async (req, res, next) => {
 //     `https://accounts.google.com/o/oauth2/v2/auth?${stingifiedParams}`
 //     )
 // }
-
+//
 // const googleRedirect = async (req, res, next) => {
 //     const fullUrl = `${req.protocol}://${req.get("host")}${req.originalUrl}`;
 //     const urlObj = new URL(fullUrl);
@@ -180,13 +243,13 @@ const refreshToken = async (req, res, next) => {
 //               });
 //       }
 //     const newSession = await Session.create({ uid: existingParent._id });
-  
+//
 //   const token = jwt.sign(
 //     { uid: existingParent._id, sid: newSession._id },
 //     JWT_SECRET,
 //     { expiresIn: "22h" }
 //   );
-  
+//
 //   const refreshToken = jwt.sign(
 //     { uid: existingParent._id, sid: newSession._id },
 //       JWT_REFRESH_SECRET,
@@ -197,9 +260,5 @@ const refreshToken = async (req, res, next) => {
 //   );
 // }
 
-
-
-
-
-const userServices = { registerUser, login, logout, refreshToken };
+const userServices = { registerUser, login, logout, refreshToken, verificationEmail, resendVerificationEmail };
 export default userServices;

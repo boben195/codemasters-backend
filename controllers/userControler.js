@@ -18,14 +18,15 @@ const currentUser = async (req, res, next) => {
     try {
         const user = req.user;
         /*Тут має бути перевірка на авторизацію */
-        const userProfile = {
-            name: user.name,
-            email: user.email,
-            gender: user.gender,
-            weight: user.weight,
-            activeTimeSport: user.activeTimeSport,
-            dailyWaterRate: user.dailyWaterRate,
-            avatarURL: user.avatarURL,
+        const userProfile = { user: {
+                name: user.name,
+                email: user.email,
+                gender: user.gender,
+                weight: user.weight,
+                activeTimeSport: user.activeTimeSport,
+                dailyWaterRate: user.dailyWaterRate,
+                avatarURL: user.avatarURL,
+            }
         }
         res.status(200).json(userProfile);
     }
@@ -68,8 +69,7 @@ const updateUser = async (req, res, next) => {
                 activeTimeSport: update.activeTimeSport,
                 dailyWaterRate: update.dailyWaterRate,
                 avatarURL: update.avatarURL,
-            },
-            message: "Woo Hoo!!! You update your profile"
+            }
         })
     }
     catch (error) {
