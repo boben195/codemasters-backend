@@ -104,6 +104,62 @@
         }
       }
     },
+    "/auth/verify/:verificationToken": {
+      "get": {
+        "summary": "Verification email",
+        "tags": [
+          "Auth"
+        ],
+        "parameters": [
+          {
+            "name": "verificationToken",
+            "description": "Email verification token",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Verification successful"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      }
+    },
+    "/auth/verify": {
+      "post": {
+        "summary": "Resend verification email",
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResendEmail"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Verification email sent"
+          },
+          "400": {
+            "description": "Verification has already been passed"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      }
+    },
     "/auth/logout": {
       "post": {
         "summary": "Logout user",
@@ -171,7 +227,7 @@
           "content": {
             "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/UserCurrentResponse"
+                "$ref": "#/components/schemas/UserUpdateRequest"
               }
             }
           }
@@ -509,13 +565,33 @@
           "user": {
             "type": "object",
             "properties": {
+              "name": {
+                "type": "string",
+                "example": "User"
+              },
               "email": {
                 "type": "string",
                 "example": "alex@example.com"
               },
-              "message": {
+              "gender": {
                 "type": "string",
-                "example": ""
+                "example": "male"
+              },
+              "weight": {
+                "type": "number",
+                "example": "0"
+              },
+              "activeTimeSport": {
+                "type": "number",
+                "example": "0"
+              },
+              "dailyWaterRate": {
+                "type": "number",
+                "example": "0"
+              },
+              "avatarURL": {
+                "type": "string",
+                "example": "//www.gravatar.com/avatar/000000000000000000"
               }
             }
           }
@@ -545,7 +621,7 @@
       "UserLoginResponse": {
         "type": "object",
         "properties": {
-          "token": {
+          "accessToken": {
             "example": "NiIsInR5cCI6IkpfffggghbGciOiJIUzI1..."
           },
           "refreshToken": {
@@ -554,10 +630,6 @@
           "user": {
             "type": "object",
             "properties": {
-              "id": {
-                "type": "string",
-                "example": "00226b9a73c29e33133f0200"
-              },
               "name": {
                 "type": "string",
                 "example": "Alex"
@@ -566,15 +638,45 @@
                 "type": "string",
                 "example": "alex@example.com"
               },
+              "gender": {
+                "type": "string",
+                "example": "male"
+              },
+              "weight": {
+                "type": "number",
+                "example": "75.5"
+              },
+              "activeTimeSport": {
+                "type": "number",
+                "example": "60"
+              },
+              "dailyWaterRate": {
+                "type": "number",
+                "example": "2.5"
+              },
               "avatarURL": {
                 "type": "string",
-                "example": "//www.gravatar.com/avatar/0000000000000"
+                "example": "//www.gravatar.com/avatar/000000000000000000"
               }
             }
           }
         }
       },
-      "UserCurrentResponse": {
+      "ResendEmail": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "alex@example.com",
+            "description": "User email address"
+          }
+        },
+        "required": [
+          "email"
+        ]
+      },
+      "UserUpdateRequest": {
         "type": "object",
         "properties": {
           "email": {
@@ -593,7 +695,7 @@
             "enum": [
               "male",
               "female",
-              "other"
+              ""
             ],
             "example": "male"
           },
@@ -620,13 +722,64 @@
           }
         }
       },
+      "UserCurrentResponse": {
+        "type": "object",
+        "properties": {
+          "user": {
+            "type": "object",
+            "properties": {
+              "email": {
+                "type": "string",
+                "description": "User email",
+                "example": "alex@example.com"
+              },
+              "name": {
+                "type": "string",
+                "description": "User name",
+                "example": "Alex"
+              },
+              "gender": {
+                "type": "string",
+                "description": "Gender",
+                "enum": [
+                  "male",
+                  "female",
+                  "other"
+                ],
+                "example": "male"
+              },
+              "weight": {
+                "type": "number",
+                "description": "Weight",
+                "example": 75.5
+              },
+              "activeTimeSport": {
+                "type": "number",
+                "description": "Activity time in minutes",
+                "example": 60
+              },
+              "dailyWaterRate": {
+                "type": "number",
+                "description": "Daily water limit",
+                "example": 2.5
+              },
+              "avatarURL": {
+                "type": "string",
+                "format": "binary",
+                "description": "Avatar image",
+                "example": "//www.gravatar.com/avatar/000000000000000000"
+              }
+            }
+          }
+        }
+      },
       "AddWater": {
         "type": "object",
         "properties": {
           "amount": {
             "type": "number",
-            "example": 0.5,
-            "description": "Amount of water"
+            "example": 50,
+            "description": "Amount of water in ml"
           },
           "year": {
             "type": "number",
@@ -635,18 +788,18 @@
           },
           "month": {
             "type": "number",
-            "example": 0,
-            "description": "User password"
+            "example": 1,
+            "description": "Month"
           },
           "day": {
             "type": "number",
             "example": 1,
-            "description": "Confirm password"
+            "description": "Day"
           },
           "time": {
             "type": "string",
-            "example": "00:16:06",
-            "description": "Confirm password"
+            "example": "00:16",
+            "description": "Time"
           }
         },
         "required": [
@@ -661,8 +814,13 @@
         "properties": {
           "amount": {
             "type": "number",
-            "example": 0.5,
-            "description": "Amount of water"
+            "example": 50,
+            "description": "Amount of water in ml"
+          },
+          "time": {
+            "type": "string",
+            "example": "00:16",
+            "description": "Time"
           }
         },
         "required": [
@@ -694,7 +852,7 @@
               },
               "amount": {
                 "type": "number",
-                "example": 0.5
+                "example": 50
               },
               "year": {
                 "type": "number",
@@ -710,7 +868,7 @@
               },
               "time": {
                 "type": "string",
-                "example": "00:16:06"
+                "example": "00:16"
               },
               "_id": {
                 "type": "string",
@@ -734,7 +892,7 @@
                 },
                 "amount": {
                   "type": "number",
-                  "example": 0.5
+                  "example": 50
                 },
                 "year": {
                   "type": "number",
@@ -750,7 +908,7 @@
                 },
                 "time": {
                   "type": "string",
-                  "example": "00:16:06"
+                  "example": "00:16"
                 },
                 "_id": {
                   "type": "string",
@@ -779,7 +937,7 @@
                 },
                 "amount": {
                   "type": "number",
-                  "example": 0.5
+                  "example": 50
                 },
                 "year": {
                   "type": "number",
@@ -795,7 +953,7 @@
                 },
                 "time": {
                   "type": "string",
-                  "example": "00:16:06"
+                  "example": "00:16"
                 },
                 "_id": {
                   "type": "string",

@@ -25,7 +25,7 @@ const waterSchema = new mongoose.Schema(
     },
     time: {
       type: String,
-      required: [true, "Please set field 'time' - example of value '00:16:06'"],
+      required: [true, "Please set field 'time' - example of value '00:16'"],
     },
   },
   {

@@ -4,7 +4,7 @@ const contactSchema = new mongoose.Schema(
     {
         name: {
             type: String,
-            
+            default: "User",
         },
         password: {
             type: String,
@@ -16,20 +16,26 @@ const contactSchema = new mongoose.Schema(
             unique: true,
         },
         weight: {
-            type: String,
+            type: Number,
+            default: "0",
         },
         gender: {
             type: String,
-            enum: ['male', 'female'],
+            enum: ['male', 'female', ""],
+            default: "",
         },
         activeTimeSport: {
-            type: String,
+            type: Number,
+            default: "0",
         },
         dailyWaterRate: {
             type: Number,
+            default: "0",
         },
-        
-        avatarURL: String,
+        avatarURL: {
+            type: String,
+            default: "",
+        },
         verify: {
             type: Boolean,
             default: false,
