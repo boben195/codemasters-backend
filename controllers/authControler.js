@@ -121,6 +121,7 @@ const logout = async (req, res, next) => {
 }
 
 // это ты перенесешь в слой для рефреша, я так понял.
+// Неа це має бути тут
 const refreshToken = async (req, res, next) => {
     const { refreshToken } = req.body;
 
@@ -129,29 +130,33 @@ const refreshToken = async (req, res, next) => {
     }
 
     try {
-        if(!Session) {
+        const { uid, sid } = jwt.verify(refreshToken, JWT_REFRESH_SECRET);
+        const session = await Session.findById(sid);
+        if(!session) {
             return res.status(401).send({message: "Invalid refresh token"})
         }
 
 
-        const user = await User.findById(decoded.uid);
+        const user = await User.findById(uid);
         if (!user) {
             return res.status(401).send({ message: "User not found" });
         }
 
+        const newSession = await Session.create({ uid: user._id });
+
         const newAccessToken = jwt.sign(
-            { uid: user._id, sid: session._id },
+            { uid: user._id, sid: newSession._id },
             JWT_SECRET,
             { expiresIn: "22h" }
         );
 
         const newRefreshToken = jwt.sign(
-            { uid: user._id, sid: session._id },
+            { uid: user._id, sid: newSession._id },
             JWT_REFRESH_SECRET,
             { expiresIn: "22h" }
         );
 
-        return res.status(200).json({token: newAccessToken, refreshToken: newRefreshToken})
+        return res.status(200).json({accessToken: newAccessToken, refreshToken: newRefreshToken})
     }
     
     catch(error) {
