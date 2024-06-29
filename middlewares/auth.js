@@ -26,7 +26,7 @@ export const auth = async (req, res, next) => {
     }
     
 
-    req.user = { uid: user._id, ...user.toObject() };
+    req.user = { uid: user._id, sid, ...user.toObject() };
     next();
   } catch (error) {
     console.error("Error verifying token:", error);

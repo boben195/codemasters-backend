@@ -7,6 +7,7 @@ import cripto from "node:crypto";
 import jwt from "jsonwebtoken";
 import mailer from "../helpers/mailer.js";
 import HttpError from "../helpers/HttpError.js";
+import gravatar from "gravatar";
 import queryString from 'query-string';
 import axios from "axios";
 
@@ -31,13 +32,12 @@ const registerUser = async (req, res, next) => {
         const verificationToken = cripto.randomUUID();
 
         const passwordHash = await bcrypt.hash(password, 10)
-        const newUser = await User.create({ email, password: passwordHash, verificationToken })
+        const avatarURL = gravatar.url(email);
+        const newUser = await User.create({ email, password: passwordHash, verificationToken, avatarURL })
 
         // Uncomment if verify email feature used
         // await mailer.sendVerificationEmail(email, verificationToken);
-
-        /*Тут має бути граватар */
-
+       
         res.status(201).json({user: {
                 "name": newUser.name,
                 "email": newUser.email,
@@ -109,8 +109,10 @@ const login = async (req, res, next) => {
 const logout = async (req, res, next) => {
     try {
         const { sid } = req.user
+        
+        
         await Session.findByIdAndDelete(sid);
-        res.status(204).json({ message: "Successfully logged out" });
+        res.status(200).json({ message: "Successfully logged out" });
     }
     catch(error) {
         next(error)
