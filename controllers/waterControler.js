@@ -9,7 +9,7 @@ const addWaterServing = async (req, res, next) => {
       ...req.body,
       owner_id: req.user.uid,
     });
-    res.send({ data: response });
+    res.send(response);
   } catch (error) {
     next(errorHelper(error));
   }
@@ -24,17 +24,18 @@ const editWaterServing = async (req, res, next) => {
     if (oldData === null) {
       return next(HttpError(404, "Not found in database"));
     }
-    if (oldData.amount === req.body.amount) {
+    if (oldData.amount === req.body.amount && oldData.time === req.body.time) {
       return res.send({ data: oldData });
     } else {
       const response = await waterModel.findByIdAndUpdate(
         oldData._id,
         {
           amount: req.body.amount,
+          time: req.body.time,
         },
         { new: true }
       );
-      res.send({ data: response });
+      res.send(response);
     }
   } catch (error) {
     next(errorHelper(error));
