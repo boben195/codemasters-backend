@@ -7,7 +7,7 @@ import fs from "fs/promises"
 
 const getAllUsers = async (req, res, next) => {
     try {
-        const users = await User.find();
+        const users = await User.countDocuments();
         res.status(200).json(users);
     } catch (error) {
         next(error);
