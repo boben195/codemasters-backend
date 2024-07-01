@@ -1,5 +1,6 @@
 import User from "../models/user.js";
 import cloudinary from "../helpers/cloudinary.js";
+import HttpError from "../helpers/HttpError.js";
 
 import path from "node:path";
 import fs from "fs/promises"
@@ -58,8 +59,8 @@ const updateUser = async (req, res, next) => {
         const update = await User.findByIdAndUpdate(_id, updateData, {new: true});
 
         if (!update) {
-            return res.status(404).json({message: "There is no such user"})
-        }
+            throw HttpError(404, "There is no such user");
+            }
         res.status(200).json({
             user: {
                 name: update.name,
