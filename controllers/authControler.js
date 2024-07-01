@@ -213,7 +213,7 @@ const resendVerificationEmail = async (req, res, next) => {
 //     `https://accounts.google.com/o/oauth2/v2/auth?${stingifiedParams}`
 //     )
 // }
-//
+
 // const googleRedirect = async (req, res, next) => {
 //     const fullUrl = `${req.protocol}://${req.get("host")}${req.originalUrl}`;
 //     const urlObj = new URL(fullUrl);
@@ -245,13 +245,13 @@ const resendVerificationEmail = async (req, res, next) => {
 //               });
 //       }
 //     const newSession = await Session.create({ uid: existingParent._id });
-//
+
 //   const token = jwt.sign(
 //     { uid: existingParent._id, sid: newSession._id },
 //     JWT_SECRET,
 //     { expiresIn: "22h" }
 //   );
-//
+
 //   const refreshToken = jwt.sign(
 //     { uid: existingParent._id, sid: newSession._id },
 //       JWT_REFRESH_SECRET,
@@ -262,5 +262,8 @@ const resendVerificationEmail = async (req, res, next) => {
 //   );
 // }
 
-const userServices = { registerUser, login, logout, refreshToken, verificationEmail, resendVerificationEmail };
+const userServices = {
+    registerUser, login, logout, refreshToken, verificationEmail, resendVerificationEmail,
+    
+ };
 export default userServices;
