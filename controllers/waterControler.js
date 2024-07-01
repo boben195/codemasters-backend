@@ -66,7 +66,7 @@ const waterConsumptionByDay = async (req, res, next) => {
     if (response.length === 0) {
       return next(HttpError(404, "No data for this queries"));
     }
-    res.send({ data: response });
+    res.send(response);
   } catch (error) {
     next(errorHelper(error));
   }

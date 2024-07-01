@@ -874,42 +874,37 @@
         }
       },
       "WaterResponseDay": {
-        "type": "object",
-        "properties": {
-          "data": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "owner_id": {
-                  "type": "string",
-                  "example": "66755b1814ecb34b3d42a997"
-                },
-                "amount": {
-                  "type": "number",
-                  "example": 50
-                },
-                "year": {
-                  "type": "number",
-                  "example": "2024"
-                },
-                "month": {
-                  "type": "number",
-                  "example": 5
-                },
-                "day": {
-                  "type": "number",
-                  "example": 22
-                },
-                "time": {
-                  "type": "string",
-                  "example": "00:16"
-                },
-                "_id": {
-                  "type": "string",
-                  "example": "6676eca999b85a80faf5665d"
-                }
-              }
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "owner_id": {
+              "type": "string",
+              "example": "66755b1814ecb34b3d42a997"
+            },
+            "amount": {
+              "type": "number",
+              "example": 50
+            },
+            "year": {
+              "type": "number",
+              "example": "2024"
+            },
+            "month": {
+              "type": "number",
+              "example": 5
+            },
+            "day": {
+              "type": "number",
+              "example": 22
+            },
+            "time": {
+              "type": "string",
+              "example": "00:16"
+            },
+            "_id": {
+              "type": "string",
+              "example": "6676eca999b85a80faf5665d"
             }
           }
         }
