@@ -1,5 +1,6 @@
 import User from "../models/user.js";
 import cloudinary from "../helpers/cloudinary.js";
+import HttpError from "../helpers/HttpError.js";
 
 import path from "node:path";
 import fs from "fs/promises"
@@ -47,7 +48,7 @@ const updateUser = async (req, res, next) => {
                 folder: "avatars",
                 public_id: path.parse(originalname).name,
             });
-            fs.unlink(tempPath);
+            await fs.unlink(tempPath);
             avatarURL = result.secure_url;
         }
         const updateData = { name, email, gender, weight, activeTimeSport, dailyWaterRate };
@@ -58,8 +59,8 @@ const updateUser = async (req, res, next) => {
         const update = await User.findByIdAndUpdate(_id, updateData, {new: true});
 
         if (!update) {
-            return res.status(404).json({message: "There is no such user"})
-        }
+            throw HttpError(404, "There is no such user");
+            }
         res.status(200).json({
             user: {
                 name: update.name,
@@ -76,33 +77,6 @@ const updateUser = async (req, res, next) => {
         next(error);
         }
 }
-
-
-// const updateUser = async (req, res, next) => {
-//     try {
-//         const { _id } = req.user;
-//         const { name, email, gender, weight, activeTimeSport, dailyWaterRate, avatarURL } = req.body;
-
-//         const update = await User.findByIdAndUpdate(_id, { name, email, gender, weight, activeTimeSport, dailyWaterRate, avatarURL });/*Я тут шось забув */
-
-//         /*Перевірка??? */
-//         res.status(200).json({
-//             user: {
-//                 name: update.name,
-//                 email: update.email,
-//                 gender: update.gender,
-//                 weight: update.weight,
-//                 activeTimeSport: update.activeTimeSport,
-//                 dailyWaterRate: update.dailyWaterRate,
-//                 avatarURL: update.avatarURL,
-//             },
-//             message: "Woo Hoo!!! You update your profile"
-//         })
-//     }
-//     catch (error) {
-//         next(error);
-//         }
-// }
 
 
 const userServices = { currentUser, getAllUsers, updateUser };
