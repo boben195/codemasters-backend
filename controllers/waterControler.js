@@ -9,7 +9,7 @@ const addWaterServing = async (req, res, next) => {
       ...req.body,
       owner_id: req.user.uid,
     });
-    res.send(response);
+    res.status(201).send(response);
   } catch (error) {
     next(errorHelper(error));
   }
@@ -76,11 +76,20 @@ const waterConsumptionByMonth = async (req, res, next) => {
     const data = await waterModel.find({ owner_id, year, month });
     const days = getDaysInMonth(Number(year), Number(month));
     const response = { days };
+
     for (let key = 1; key <= days; key++) {
       response[key] = [];
     }
-    data.forEach((element) => {
-      response[element.day].push(element);
+
+    data.forEach((el) => {
+      response[el.day].push({
+        _id: el._id,
+        amount: el.amount,
+        year: el.year,
+        month: el.month,
+        day: el.day,
+        time: el.time,
+      });
     });
 
     res.send({ data: response });
