@@ -78,13 +78,13 @@ const login = async (req, res, next) => {
   const accessToken = jwt.sign(
     { uid: user._id, sid: newSession._id },
     JWT_SECRET,
-    { expiresIn: "22h" }
+    { expiresIn: "1h" }
   );
   
   const refreshToken = jwt.sign(
     { uid: user._id, sid: newSession._id },
       JWT_REFRESH_SECRET,
-    { expiresIn: "22h" }
+    { expiresIn: "22d" }
         );
 
        return res.status(200).json({
@@ -147,13 +147,13 @@ const refreshToken = async (req, res, next) => {
         const newAccessToken = jwt.sign(
             { uid: user._id, sid: newSession._id },
             JWT_SECRET,
-            { expiresIn: "22h" }
+            { expiresIn: "1h" }
         );
 
         const newRefreshToken = jwt.sign(
             { uid: user._id, sid: newSession._id },
             JWT_REFRESH_SECRET,
-            { expiresIn: "22h" }
+            { expiresIn: "22d" }
         );
 
         return res.status(200).json({accessToken: newAccessToken, refreshToken: newRefreshToken})
@@ -254,13 +254,13 @@ const resendVerificationEmail = async (req, res, next) => {
 //   const token = jwt.sign(
 //     { uid: existingParent._id, sid: newSession._id },
 //     JWT_SECRET,
-//     { expiresIn: "22h" }
+//     { expiresIn: "1h" }
 //   );
 
 //   const refreshToken = jwt.sign(
 //     { uid: existingParent._id, sid: newSession._id },
 //       JWT_REFRESH_SECRET,
-//     { expiresIn: "22h" }
+//     { expiresIn: "22d" }
 //     );
 //     return res.redirect(
 //     `${existingParent.originUrl}?accessToken=${token}&refreshToken=${refreshToken}&sid=${newSession._id}`

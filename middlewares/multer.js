@@ -16,4 +16,17 @@ const limits = {
     fileSize: 1 * 1024 * 1024
 }
 
-export default multer({ storage, limits });
+const upload = multer({ storage, limits }).single("avatarURL");
+
+const limitUpload = (req, res, next) => {
+    upload(req, res, (err) => {
+        if (err instanceof multer.MulterError) {
+            return res.status(400).json({ message: "Your img is too big! Change size (max 1 MB)" });
+        } else if (err) {
+            return res.status(500).json({ message: err.message });
+        }
+        next();
+    });
+};
+
+export default limitUpload;
