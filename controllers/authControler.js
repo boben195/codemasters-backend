@@ -22,12 +22,14 @@ const registerUser = async (req, res, next) => {
     try {
         const {  email, password, password_conform } = req.body;
         if (password !== password_conform) {
-            return res.status(400).json({message: "Passwords dont match. Enter correct!"})
+            throw HttpError(400, "Passwords dont match. Enter correct!")
+            // return res.status(400).json({message: "Passwords dont match. Enter correct!"})
         }
 
         const user = await User.findOne({ email });
         if (user !== null) {
-            return res.status(409).send({message: "Email already exist"})
+            throw HttpError(409, "Email already exist")
+            // return res.status(409).send({message: "Email already exist"})
         }
         const verificationToken = cripto.randomUUID();
 
@@ -62,16 +64,18 @@ const login = async (req, res, next) => {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
 
-    if (user === null) {
-        return res.status(404).send({message: "User not found"})
+        if (user === null) {
+        throw HttpError(404, "User not found")
+        // return res.status(404).send({message: "User not found"})
     }
     // Uncomment if verify email feature used
     // if (!user.verify) {
     //     return res.status(403).send({message: "Email requires confirmation!"})
     // }
     const passwordCompare = await bcrypt.compare(password, user.password);
-    if (passwordCompare === false) {
-        return res.status(401).send({message: "Email or password is wrong"})
+        if (passwordCompare === false) {
+        throw HttpError(401, "Email or password is wrong")
+        // return res.status(401).send({message: "Email or password is wrong"})
     }
     const newSession = await Session.create({ uid: user._id });
   
@@ -109,8 +113,7 @@ const login = async (req, res, next) => {
 const logout = async (req, res, next) => {
     try {
         const { sid } = req.user
-        
-        
+
         await Session.findByIdAndDelete(sid);
         res.status(200).json({ message: "Successfully logged out" });
     }
@@ -126,20 +129,23 @@ const refreshToken = async (req, res, next) => {
     const { refreshToken } = req.body;
 
     if (!refreshToken) {
-        return res.status(400).send({message: "Refresh token is required"})
+        throw HttpError(400, "Refresh token is required")
+        // return res.status(400).send({message: "Refresh token is required"})
     }
 
     try {
         const { uid, sid } = jwt.verify(refreshToken, JWT_REFRESH_SECRET);
         const session = await Session.findById(sid);
-        if(!session) {
-            return res.status(401).send({message: "Invalid refresh token"})
+        if (!session) {
+            throw HttpError(401, "Invalid refresh token");
+            // return res.status(401).send({message: "Invalid refresh token"})
         }
 
 
         const user = await User.findById(uid);
         if (!user) {
-            return res.status(401).send({ message: "User not found" });
+            throw HttpError(401, "User not found");
+            // return res.status(401).send({ message: "User not found" });
         }
 
         const newSession = await Session.create({ uid: user._id });
