@@ -23,27 +23,8 @@ export const authRefresh = async (req, res, next) => {
             return res.status(401).json({ message: "User not found" });
         }
       
-        await Session.findByIdAndDelete(sid);
-        const newSession = await Session.create({ uid: user._id });
-      
-        const newAccessToken = jwt.sign(
-           { uid: user._id, sid: newSession._id },
-           JWT_SECRET,
-           { expiresIn: "22h" }
-           );
-      
-         const newRefreshToken = jwt.sign(
-           { uid: user._id, sid: newSession._id },
-           JWT_REFRESH_SECRET,
-           { expiresIn: "22h" }
-           );
-      
-         return res.status(200).json({
-          accessToken: newAccessToken,
-          refreshToken: newRefreshToken,
-          sid: newSession._id,
-          message: "Woo hoo! You refresh token like a champ!"
-           })
+        req.user = { uid: user._id, ...user.toObject() };
+        next();
    
   } catch (error) {
     console.error("Error verifying token:", error);
