@@ -47,7 +47,7 @@ const updateUser = async (req, res, next) => {
                 folder: "avatars",
                 public_id: path.parse(originalname).name,
             });
-            fs.unlink(tempPath);
+            await fs.unlink(tempPath);
             avatarURL = result.secure_url;
         }
         const updateData = { name, email, gender, weight, activeTimeSport, dailyWaterRate };
@@ -76,33 +76,6 @@ const updateUser = async (req, res, next) => {
         next(error);
         }
 }
-
-
-// const updateUser = async (req, res, next) => {
-//     try {
-//         const { _id } = req.user;
-//         const { name, email, gender, weight, activeTimeSport, dailyWaterRate, avatarURL } = req.body;
-
-//         const update = await User.findByIdAndUpdate(_id, { name, email, gender, weight, activeTimeSport, dailyWaterRate, avatarURL });/*Я тут шось забув */
-
-//         /*Перевірка??? */
-//         res.status(200).json({
-//             user: {
-//                 name: update.name,
-//                 email: update.email,
-//                 gender: update.gender,
-//                 weight: update.weight,
-//                 activeTimeSport: update.activeTimeSport,
-//                 dailyWaterRate: update.dailyWaterRate,
-//                 avatarURL: update.avatarURL,
-//             },
-//             message: "Woo Hoo!!! You update your profile"
-//         })
-//     }
-//     catch (error) {
-//         next(error);
-//         }
-// }
 
 
 const userServices = { currentUser, getAllUsers, updateUser };
