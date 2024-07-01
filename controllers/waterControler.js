@@ -63,9 +63,6 @@ const waterConsumptionByDay = async (req, res, next) => {
     const { year, month, day } = req.params;
     const owner_id = req.user.uid;
     const response = await waterModel.find({ owner_id, year, month, day });
-    if (response.length === 0) {
-      return next(HttpError(404, "No data for this queries"));
-    }
     res.send(response);
   } catch (error) {
     next(errorHelper(error));
