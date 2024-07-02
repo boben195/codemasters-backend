@@ -104,62 +104,6 @@
         }
       }
     },
-    "/auth/verify/:verificationToken": {
-      "get": {
-        "summary": "Verification email",
-        "tags": [
-          "Auth"
-        ],
-        "parameters": [
-          {
-            "name": "verificationToken",
-            "description": "Email verification token",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Verification successful"
-          },
-          "404": {
-            "description": "User not found"
-          }
-        }
-      }
-    },
-    "/auth/verify": {
-      "post": {
-        "summary": "Resend verification email",
-        "tags": [
-          "Auth"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ResendEmail"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Verification email sent"
-          },
-          "400": {
-            "description": "Verification has already been passed"
-          },
-          "404": {
-            "description": "User not found"
-          }
-        }
-      }
-    },
     "/auth/logout": {
       "post": {
         "summary": "Logout user",
@@ -275,7 +219,7 @@
           }
         },
         "responses": {
-          "200": {
+          "201": {
             "description": "OK",
             "content": {
               "application/json": {
@@ -545,12 +489,6 @@
             "format": "password",
             "example": "qwerty",
             "description": "User password"
-          },
-          "password_conform": {
-            "type": "string",
-            "format": "password",
-            "example": "qwerty",
-            "description": "Confirm password"
           }
         },
         "required": [
@@ -661,20 +599,6 @@
             }
           }
         }
-      },
-      "ResendEmail": {
-        "type": "object",
-        "properties": {
-          "email": {
-            "type": "string",
-            "format": "email",
-            "example": "alex@example.com",
-            "description": "User email address"
-          }
-        },
-        "required": [
-          "email"
-        ]
       },
       "UserUpdateRequest": {
         "type": "object",
@@ -939,7 +863,7 @@
                 },
                 "day": {
                   "type": "number",
-                  "example": 22
+                  "example": 1
                 },
                 "time": {
                   "type": "string",
