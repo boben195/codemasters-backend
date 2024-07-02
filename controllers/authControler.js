@@ -20,10 +20,8 @@ const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET;
 
 const registerUser = async (req, res, next) => {
     try {
-        const {  email, password, password_conform } = req.body;
-        if (password !== password_conform) {
-            throw HttpError(400, "Passwords dont match. Enter correct!")
-            }
+        const {  email, password } = req.body;
+        
 
         const user = await User.findOne({ email });
         if (user !== null) {
