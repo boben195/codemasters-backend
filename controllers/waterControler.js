@@ -25,7 +25,7 @@ const editWaterServing = async (req, res, next) => {
       return next(HttpError(404, "Not found in database"));
     }
     if (oldData.amount === req.body.amount && oldData.time === req.body.time) {
-      return res.send({ data: oldData });
+      return res.send(oldData);
     } else {
       const response = await waterModel.findByIdAndUpdate(
         oldData._id,
